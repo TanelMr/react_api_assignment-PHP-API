@@ -14,9 +14,9 @@ function App() {
     }, []);
 
     const fetchData = async () => {
-        await fetch("https://jsonplaceholder.typicode.com/todos?_start=0&_limit=10")
+        await fetch("http://192.168.29.197/api.php/records/todos")
             .then((response) => response.json())
-            .then((data) => setToDo(data))
+            .then((data) => setToDo(data.records))
             .catch((error) => console.log(error));
     };
 
@@ -28,18 +28,20 @@ function App() {
         const title = evt.target.task.value
         const completed = evt.target.completed.value
 
-        await fetch("https://jsonplaceholder.typicode.com/todos/", {
+        await fetch("http://192.168.29.197/api.php/records/todos/", {
             method: "POST",
             body: JSON.stringify({
                 title: title,
-                completed: completed,
+                completed: completed
             }),
             headers: {
-                "Content-type": "application/json; charset=UTF-8"
+                "Content-type": "application/json; charset=UTF-8",
+                'Accept': 'application/json',
             }
-        })
+        }
+        )
             .then((response) => {
-                    if (response.status !== 201) {
+                    if (response.status !== 200) {
                         console.log("Post method failed")
                     } else {
                         console.log("Post method was success")
@@ -47,20 +49,16 @@ function App() {
                     }
             })
             .then((data) => {
-
-                const getLastId = toDo[toDo.length -1 ]
-                const setLastId = getLastId.id
-                data.id = setLastId + 1
-                setToDo((toDo) => [...toDo, data]);
-
+                setToDo((toDo) => [...toDo]);
                 }
             )
             evt.target.task.value = ""
             evt.target.completed.value = ""
+            await fetchData();
     };
 
     const onEdit = async (id, title, completed) => {
-        await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+        await fetch(`http://192.168.29.197/api.php/records/todos/` + id, {
             method: "PUT",
             body: JSON.stringify({
                 title: title,
@@ -93,10 +91,11 @@ function App() {
     };
 
     const onDelete = async (id) => {
-        await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+        await fetch(`http://192.168.29.197/api.php/records/todos/` + id, {
             method: "DELETE"
         })
             .then((response) => {
+                console.log(response.status)
                 if (response.status !== 200) {
                     console.log("Delete method error")
                 } else {
@@ -109,6 +108,7 @@ function App() {
                 }
             })
             .catch((error) => console.log(error));
+             await fetchData()
     };
 
 
